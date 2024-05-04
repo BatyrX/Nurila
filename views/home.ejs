@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Журнал оценок и прогресса</title>
+</head>
+<body>
+  <header>
+    <h1>Журнал оценок и прогресса</h1>
+  </header>
+  <main>
+    <div class="gradeListContainer">
+      <h2>Журнал оценок</h2>
+      <div id="gradesList">
+        <% grades.forEach(grade => { %>
+          <div class="gradeItem">
+            <span class="studentName">Имя: <%= grade.firstName %> <%= grade.lastName %></span>
+            <span class="subject">Предмет: <%= grade.subject %></span>
+            <span class="grade">Оценка: <%= grade.grade %></span>
+            <span class="date">Дата: <%= grade.date %></span>
+            <span class="semester">Семестр: <%= grade.semester %></span>
+          </div>
+        <% }); %>
+      </div>
+      <!-- Блок для вывода среднего балла -->
+      <div class="averageGrade">
+        Средний балл: <%= averageGrade %> <!-- Отображение переменной averageGrade, переданной с сервера -->
+      </div>
+      <!-- Кнопка "Очистить" для полной очистки журнала -->
+      <button id="clearGradesButton" data-id="clearGrades">Очистить</button>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const clearGradesButton = document.getElementById('clearGradesButton');
+    if (clearGradesButton) {
+      clearGradesButton.addEventListener('click', async () => {
+        try {
+          const response = await fetch('/clear-data', {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          });
+          if (response.ok) {
+            alert('Данные успешно удалены из базы данных');
+            window.location.reload(); // Перезагрузка страницы для обновления данных
+          } else {
+            throw new Error('Ошибка при удалении данных из базы данных');
+          }
+        } catch (err) {
+          console.error(err);
+          alert('Произошла ошибка при удалении данных из базы данных');
+        }
+      });
+    }
+  });
+</script>
+    </div>
+    <section id="grades">
+      <form id="addGradeForm" action="/grades" method="POST">
+        <label for="firstName">Имя:</label>
+        <input type="text" id="firstName" name="firstName" required>
+        <label for="lastName">Фамилия:</label>
+        <input type="text" id="lastName" name="lastName" required>
+        <label for="semesterSelect">Выберите семестр:</label>
+        <select id="semesterSelect" name="semester" required>
+          <option value="" disabled selected>Выберите семестр</option>
+          <option value="1">1 семестр</option>
+          <option value="2">2 семестр</option>
+        </select>
+          <label for="subject">Предмет:</label>
+          <select id="subject" name="subject" required>
+            <option value="" disabled selected>Выберите предмет</option>
+            <option value="Математика">Математика</option>
+            <option value="Информатика">Информатика</option>
+            <option value="Программирование">Программирование</option>
+            <option value="История">История</option>
+          </select>
+        <label for="grade">Оценка:</label>
+        <input type="number" id="grade" name="grade" min="1" max="5" required>
+        <label for="date">Дата:</label>
+        <input type="date" id="date" name="date" required> <!-- Поле для ввода даты -->
+        <button type="submit">Добавить оценку</button>
+      </form>
+      <form id="searchForm" action="/search" method="POST">
+        <label for="searchInput">Поиск по имени или фамилии:</label>
+        <input type="text" id="searchInput" name="searchQuery" required>
+        <button type="submit">Найти</button>
+      </form>
+    </section>
+  </main>
+  <footer>
+    <p>&copy; 2024 Журнал оценок и прогресса</p>
+  </footer>
+  <script src="/nurik/server/public/script.js"></script>
+</body>
+</html>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #FFFFE0; /* Изменен цвет фона */
+  }
+  
+  header {
+    background-color: #D8BFD8;
+    color: #fff;
+    padding: 1rem;
+    text-align: center;
+  }
+  
+  main {
+    display: flex;
+    flex-direction: row; /* Изменено на 'row' */
+    align-items: flex-start; /* Изменено на 'flex-start' */
+    justify-content: space-around; /* Добавлено для распределения пространства вокруг блоков */
+    padding: 1rem;
+  }
+  
+  section {
+    margin-bottom: 1rem;
+    padding: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #E6E6FA; /* Изменен цвет фона области */
+    width: 100%;
+    max-width: 800px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Тень блока */
+  }
+  
+  h1, h2 {
+    margin-top: 0;
+    color: #333;
+  }
+  
+  form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  label {
+    margin-bottom: 0.5rem;
+  }
+  
+  input,
+  button {
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+    border-radius: 3px;
+    border: 1px solid #ccc;
+  }
+  
+  button {
+    cursor: pointer;
+    background-color: #90EE90; /* Яркий оранжевый цвет */
+    color: #fff;
+    border: none;
+    transition: background-color 0.3s ease; /* Плавный переход при наведении */
+  }
+  
+  button:hover {
+    background-color: #03863b; /* Измененный цвет при наведении */
+  }
+  
+  footer {
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    padding: 1rem;
+  }
+  
+  .gradeListContainer {
+    margin-top: 20px;
+    background-color: #FFDAB9;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 300px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  
+    </style>
